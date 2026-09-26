@@ -2,11 +2,6 @@ name: MailAccess self-investigation
 
 on:
   workflow_dispatch:
-    inputs:
-      email:
-        description: "Email address you own and are authorized to investigate"
-        required: true
-        type: string
 
 jobs:
   investigate:
@@ -18,8 +13,9 @@ jobs:
 
       - name: Investigate
         env:
-          TARGET_EMAIL: ${{ inputs.email }}
+          TARGET_EMAIL: ${{ secrets.MAILACCESS_TARGET_EMAIL }}
         run: |
+          test -n "$TARGET_EMAIL" || { echo "MAILACCESS_TARGET_EMAIL secret is not configured"; exit 1; }
           mkdir -p report
           mailaccess investigate "$TARGET_EMAIL" -o report/mailaccess-report.json
 
